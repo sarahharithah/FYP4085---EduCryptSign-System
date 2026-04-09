@@ -1,79 +1,60 @@
+# -*- coding: utf-8 -*-
 #
-# A block cipher is instantiated as a combination of:
-# 1. A base cipher (such as AES)
-# 2. A mode of operation (such as CBC)
+#  SelfTest/Cipher/__init__.py: Self-test for cipher modules
 #
-# Both items are implemented as C modules.
+# Written in 2008 by Dwayne C. Litzenberger <dlitz@dlitz.net>
 #
-# The API of #1 is (replace "AES" with the name of the actual cipher):
-# - AES_start_operaion(key) --> base_cipher_state
-# - AES_encrypt(base_cipher_state, in, out, length)
-# - AES_decrypt(base_cipher_state, in, out, length)
-# - AES_stop_operation(base_cipher_state)
+# ===================================================================
+# The contents of this file are dedicated to the public domain.  To
+# the extent that dedication to the public domain is not available,
+# everyone is granted a worldwide, perpetual, royalty-free,
+# non-exclusive license to exercise all rights associated with the
+# contents of this file for any purpose whatsoever.
+# No rights are reserved.
 #
-# Where base_cipher_state is AES_State, a struct with BlockBase (set of
-# pointers to encrypt/decrypt/stop) followed by cipher-specific data.
-#
-# The API of #2 is (replace "CBC" with the name of the actual mode):
-# - CBC_start_operation(base_cipher_state) --> mode_state
-# - CBC_encrypt(mode_state, in, out, length)
-# - CBC_decrypt(mode_state, in, out, length)
-# - CBC_stop_operation(mode_state)
-#
-# where mode_state is a a pointer to base_cipher_state plus mode-specific data.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# ===================================================================
 
-import os
+"""Self-test for cipher modules"""
 
-from Crypto.Cipher._mode_ecb import _create_ecb_cipher
-from Crypto.Cipher._mode_cbc import _create_cbc_cipher
-from Crypto.Cipher._mode_cfb import _create_cfb_cipher
-from Crypto.Cipher._mode_ofb import _create_ofb_cipher
-from Crypto.Cipher._mode_ctr import _create_ctr_cipher
-from Crypto.Cipher._mode_openpgp import _create_openpgp_cipher
-from Crypto.Cipher._mode_ccm import _create_ccm_cipher
-from Crypto.Cipher._mode_eax import _create_eax_cipher
-from Crypto.Cipher._mode_siv import _create_siv_cipher
-from Crypto.Cipher._mode_gcm import _create_gcm_cipher
-from Crypto.Cipher._mode_ocb import _create_ocb_cipher
+__revision__ = "$Id$"
 
-_modes = { 1:_create_ecb_cipher,
-           2:_create_cbc_cipher,
-           3:_create_cfb_cipher,
-           5:_create_ofb_cipher,
-           6:_create_ctr_cipher,
-           7:_create_openpgp_cipher,
-           9:_create_eax_cipher
-           }
+def get_tests(config={}):
+    tests = []
+    from Crypto.SelfTest.Cipher import test_AES;      tests += test_AES.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_ARC2;     tests += test_ARC2.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_ARC4;     tests += test_ARC4.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_Blowfish; tests += test_Blowfish.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_CAST;     tests += test_CAST.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_DES3;     tests += test_DES3.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_DES;      tests += test_DES.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_Salsa20; tests += test_Salsa20.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_ChaCha20; tests += test_ChaCha20.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_ChaCha20_Poly1305; tests += test_ChaCha20_Poly1305.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_pkcs1_15; tests += test_pkcs1_15.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_pkcs1_oaep; tests += test_pkcs1_oaep.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_OCB;        tests += test_OCB.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_CBC;        tests += test_CBC.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_CFB;        tests += test_CFB.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_OpenPGP;    tests += test_OpenPGP.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_OFB;        tests += test_OFB.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_CTR;        tests += test_CTR.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_CCM;        tests += test_CCM.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_EAX;        tests += test_EAX.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_GCM;        tests += test_GCM.get_tests(config=config)
+    from Crypto.SelfTest.Cipher import test_SIV;        tests += test_SIV.get_tests(config=config)
+    return tests
 
-_extra_modes = { 8:_create_ccm_cipher,
-                10:_create_siv_cipher,
-                11:_create_gcm_cipher,
-                12:_create_ocb_cipher
-                }
+if __name__ == '__main__':
+    import unittest
+    suite = lambda: unittest.TestSuite(get_tests())
+    unittest.main(defaultTest='suite')
 
-def _create_cipher(factory, key, mode, *args, **kwargs):
-
-    kwargs["key"] = key
-
-    modes = dict(_modes)
-    if kwargs.pop("add_aes_modes", False):
-        modes.update(_extra_modes)
-    if not mode in modes:
-        raise ValueError("Mode not supported")
-
-    if args:
-        if mode in (8, 9, 10, 11, 12):
-            if len(args) > 1:
-                raise TypeError("Too many arguments for this mode")
-            kwargs["nonce"] = args[0]
-        elif mode in (2, 3, 5, 7):
-            if len(args) > 1:
-                raise TypeError("Too many arguments for this mode")
-            kwargs["IV"] = args[0]
-        elif mode == 6:
-            if len(args) > 0:
-                raise TypeError("Too many arguments for this mode")
-        elif mode == 1:
-            raise TypeError("IV is not meaningful for the ECB mode")
-
-    return modes[mode](factory, **kwargs)
+# vim:set ts=4 sw=4 sts=4 expandtab:
