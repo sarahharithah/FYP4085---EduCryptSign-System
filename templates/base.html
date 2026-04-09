@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduCryptSign - UNITAR{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --unitar-blue: #1e4d8b;
+            --unitar-light-blue: #2d6da8;
+            --unitar-orange: #e85d04;
+            --unitar-gray: #f5f5f5;
+            --unitar-text: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        
+        /* Top Header with UNITAR Logo */
+        .top-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .unitar-logo {
+            height: 60px;
+            width: auto;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-text .main-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--unitar-blue);
+            line-height: 1.2;
+        }
+        
+        .logo-text .sub-title {
+            font-size: 0.85rem;
+            color: var(--unitar-orange);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .tagline {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 2px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .powered-by {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .powered-by img {
+            height: 30px;
+        }
+        
+        /* Main Content Area */
+        .main-wrapper {
+            min-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Login Page Layout - Matching UNITAR Style */
+        .login-page {
+            flex: 1;
+            display: flex;
+            background: linear-gradient(rgba(30, 77, 139, 0.8), rgba(30, 77, 139, 0.9)),
+                        url('https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            position: relative;
+        }
+        
+        .login-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            min-height: 600px;
+        }
+        
+        /* Left side - Info/Tweets section (optional) */
+        .login-info {
+            flex: 1;
+            color: white;
+            padding-right: 60px;
+            max-width: 600px;
+        }
+        
+        .login-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .login-info p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+        
+        .feature-list {
+            margin-top: 30px;
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1rem;
+        }
+        
+        .feature-list i {
+            color: #4ade80;
+            font-size: 1.2rem;
+        }
+        
+        /* Right side - Login Form */
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 400px;
+            padding: 35px;
+        }
+        
+        .login-card h3 {
+            color: var(--unitar-blue);
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-right: none;
+            color: #666;
+            padding: 12px 15px;
+        }
+        
+        .form-control {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--unitar-blue);
+            box-shadow: 0 0 0 3px rgba(30, 77, 139, 0.1);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+        }
+        
+        .btn-login {
+            background: var(--unitar-blue);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-login:hover {
+            background: var(--unitar-light-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 77, 139, 0.3);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .btn-register {
+            background: var(--unitar-orange);
+            color: white;
+            border: none;
+        }
+        
+        .btn-register:hover {
+            background: #d15104;
+            color: white;
+        }
+        
+        .btn-forgot {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+        
+        .btn-forgot:hover {
+            background: #c82333;
+            color: white;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-header {
+            background: var(--unitar-blue);
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .user-details h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .user-details span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        /* Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-top: 4px solid var(--unitar-blue);
+        }
+        
+        .dashboard-card.warning {
+            border-top-color: var(--unitar-orange);
+        }
+        
+        .dashboard-card.success {
+            border-top-color: #28a745;
+        }
+        
+        .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--unitar-blue);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        /* Sidebar for Dashboard */
+        .dashboard-layout {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .sidebar-nav {
+            width: 260px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 20px 0;
+            height: fit-content;
+        }
+        
+        .sidebar-nav .nav-item {
+            list-style: none;
+        }
+        
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            background: #f8f9fa;
+            color: var(--unitar-blue);
+            border-left-color: var(--unitar-blue);
+        }
+        
+        .sidebar-nav .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content-area {
+            flex: 1;
+        }
+        
+        /* Tables */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .custom-table th {
+            background: #f8f9fa;
+            color: var(--unitar-blue);
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .custom-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        
+        .custom-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-ready {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .badge-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Buttons */
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary-custom {
+            background: var(--unitar-blue);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            background: var(--unitar-light-blue);
+        }
+        
+        .btn-success-custom {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success-custom:hover {
+            background: #218838;
+        }
+        
+        /* Alerts */
+        .custom-alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-info-custom {
+            background: #e7f3ff;
+            border-left: 4px solid var(--unitar-blue);
+            color: var(--unitar-blue);
+        }
+        
+        .alert-success-custom {
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .login-info {
+                display: none;
+            }
+            
+            .login-card {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .dashboard-layout {
+                flex-direction: column;
+            }
+            
+            .sidebar-nav {
+                width: 100%;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top Header with UNITAR Logo -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <!-- UNITAR Logo - Replace src with actual logo path -->
+                <img src="https://www.unitar.my/wp-content/uploads/2021/09/UNITAR-Logo-1.png" 
+                     alt="UNITAR Logo" 
+                     class="unitar-logo"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <!-- Fallback text logo if image fails -->
+                <div style="display: none; flex-direction: column;">
+                    <span style="font-size: 2rem; font-weight: 800; color: var(--unitar-blue);">UNITAR</span>
+                    <span style="font-size: 0.8rem; color: var(--unitar-orange);">INTERNATIONAL UNIVERSITY</span>
+                </div>
+                <div class="logo-text">
+                    <span class="main-title">EduCryptSign</span>
+                    <span class="sub-title">SECURE ACADEMIC DIGITAL SIGNING</span>
+                    <span class="tagline">Wisdom of the Past, Inspired for the Future</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="powered-by">
+                    <span>Driven by</span>
+                    <span style="font-weight: 700; color: var(--unitar-blue);">EduCryptSign</span>
+                </div>
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="dashboard-content" style="margin-top: 20px;">
+                    {% for category, message in messages %}
+                    <div class="custom-alert alert-{{ 'info' if category == 'info' else 'success' if category == 'success' else 'danger' if category == 'danger' else 'warning' }}-custom">
+                        <i class="fas fa-{{ 'info-circle' if category == 'info' else 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'danger' else 'exclamation-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p><strong>UNITAR International University</strong></p>
+            <p>EduCryptSign - Secure Academic Digital Signing System</p>
+            <p>&copy; 2026 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Request Transcript - EduCryptSign{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="dashboard-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="user-details">
+                <h4>Request Transcript</h4>
+                <span><i class="fas fa-file-signature"></i> Secure Digital Signing</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar-nav">
+            <ul style="padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('student_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('request_transcript') }}">
+                        <i class="fas fa-file-signature"></i> Request Transcript
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content-area">
+            <div class="dashboard-card">
+                <div class="card-header-custom">
+                    <h3 class="card-title"><i class="fas fa-file-signature"></i> Submit Transcript Request</h3>
+                    <a href="{{ url_for('student_dashboard') }}" class="btn-action btn-primary-custom">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+                
+                <div class="custom-alert alert-info-custom">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Important:</strong> You need to upload your digital signature file and provide your password to cryptographically sign this request. This ensures the authenticity and integrity of your request.
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('request_transcript') }}" enctype="multipart/form-data" style="max-width: 800px;">
+                    
+                    <!-- Reason -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: var(--unitar-blue);">
+                            Reason for Request <span style="color: #dc3545;">*</span>
+                        </label>
+                        <textarea class="form-control" name="reason" rows="3" required 
+                                  placeholder="e.g., Job application, graduate school admission, employment verification"
+                                  style="resize: vertical;"></textarea>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Provide a clear reason for your transcript request.
+                        </small>
+                    </div>
+
+                    <!-- Digital Signature Upload -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: var(--unitar-blue);">
+                            Digital Signature File <span style="color: #dc3545;">*</span>
+                        </label>
+                        <div class="upload-zone" 
+                             style="border: 2px dashed #ddd; border-radius: 8px; padding: 40px; text-align: center; background: #f8f9fa; cursor: pointer; transition: all 0.3s;"
+                             onclick="document.getElementById('signatureFile').click()"
+                             ondragover="this.style.borderColor='var(--unitar-blue)'; this.style.background='#e7f3ff';"
+                             ondragleave="this.style.borderColor='#ddd'; this.style.background='#f8f9fa';"
+                             ondrop="handleDrop(event)">
+                            <i class="fas fa-signature" style="font-size: 3rem; color: var(--unitar-blue); margin-bottom: 15px; display: block;"></i>
+                            <h6 style="color: #333; margin-bottom: 10px;">Upload Your Digital Signature</h6>
+                            <p style="color: #666; margin-bottom: 5px; font-size: 0.9rem;">Drag & drop your signature image here, or click to browse</p>
+                            <p style="color: #999; font-size: 0.85rem;">Supported: PNG, JPG, JPEG</p>
+                            <input type="file" id="signatureFile" name="signature_file" 
+                                   class="d-none" accept="image/*" required 
+                                   onchange="showFileName(this)">
+                            <div id="fileNameDisplay" style="margin-top: 15px; color: #28a745; font-weight: 600;"></div>
+                        </div>
+                        <small style="color: #666; display: block; margin-top: 10px;">
+                            <i class="fas fa-shield-alt" style="color: var(--unitar-blue);"></i> 
+                            This signature will be used to verify your identity and authenticate your request.
+                        </small>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: var(--unitar-blue);">
+                            Your Password <span style="color: #dc3545;">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" name="password" required
+                                   placeholder="Enter your account password">
+                        </div>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            <i class="fas fa-key" style="color: var(--unitar-blue);"></i> 
+                            Your password is used to create a cryptographic signature.
+                        </small>
+                    </div>
+
+                    <!-- Submit -->
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="btn-login" style="flex: 1;">
+                            <i class="fas fa-paper-plane"></i> Submit Signed Request
+                        </button>
+                        <a href="{{ url_for('student_dashboard') }}" class="btn-action btn-secondary" style="background: #6c757d; color: white; text-decoration: none;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showFileName(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('fileNameDisplay').innerHTML = 
+                '<i class="fas fa-check-circle"></i> Selected: ' + input.files[0].name;
+        }
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const dropZone = e.currentTarget;
+        dropZone.style.borderColor = '#ddd';
+        dropZone.style.background = '#f8f9fa';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const fileInput = document.getElementById('signatureFile');
+            fileInput.files = files;
+            showFileName(fileInput);
+        }
+    }
+</script>
+{% endblock %}

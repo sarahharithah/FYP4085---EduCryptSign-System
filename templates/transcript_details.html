@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Verify Request{% endblock %}
+
+{% block content %}
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h4><i class="fas fa-file-signature text-primary"></i> Request Details</h4>
+                <hr>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Request ID:</strong> #{{ request['id'] }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Student:</strong> {{ request['student_username'] }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Email:</strong> {{ request['student_email'] }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date Requested:</strong> {{ request['created_at'] }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Reason:</strong>
+                    <p class="mt-2 p-3 bg-light rounded">{{ request['reason'] }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Digital Signature Status:</strong><br>
+                    {% if is_valid %}
+                    <span class="signature-badge signature-valid mt-2">
+                        <i class="fas fa-check-circle"></i> VALID - Signature Verified
+                    </span>
+                    <p class="text-success mt-2">
+                        <i class="fas fa-info-circle"></i> This request is cryptographically signed and verified authentic.
+                    </p>
+                    {% else %}
+                    <span class="signature-badge signature-invalid mt-2">
+                        <i class="fas fa-times-circle"></i> INVALID - Verification Failed
+                    </span>
+                    <p class="text-danger mt-2">
+                        <i class="fas fa-exclamation-triangle"></i> Warning: This signature could not be verified. Request may be forged.
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Current Status:</strong>
+                    {% if request['status'] == 'pending' %}
+                    <span class="badge bg-warning">Pending Review</span>
+                    {% elif request['status'] == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                    {% else %}
+                    <span class="badge bg-danger">Rejected</span>
+                    {% endif %}
+                </div>
+                
+                {% if request['status'] == 'pending' and is_valid %}
+                <hr>
+                <h5>Process Request</h5>
+                <form method="POST" action="{{ url_for('process_request', request_id=request['id']) }}">
+                    <div class="mb-3">
+                        <label class="form-label">Admin Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                    <div class="btn-group w-100">
+                        <button type="submit" name="action" value="approved" class="btn btn-success">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button type="submit" name="action" value="rejected" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

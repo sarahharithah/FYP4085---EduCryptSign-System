@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Session Expired - EduCryptSign{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-clock fa-5x text-warning"></i>
+                    </div>
+                    
+                    <h2 class="mb-3">Session Expired</h2>
+                    <p class="text-muted mb-4">
+                        Your session has expired due to inactivity. 
+                        For security reasons, you have been automatically logged out.
+                    </p>
+                    
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Security Notice:</strong> Session expiration prevents unauthorized access 
+                        to your account if you leave your device unattended.
+                    </div>
+                    
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-sign-in-alt"></i> Login Again
+                    </a>
+                    
+                    <p class="mt-3 mb-0 text-muted small">
+                        If you were in the middle of something, your data may have been saved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .card {
+        border-radius: 15px;
+    }
+</style>
+{% endblock %}

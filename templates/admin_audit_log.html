@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Audit Log - EduCryptSign{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="dashboard-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="user-details">
+                <h4>Audit Log</h4>
+                <span><i class="fas fa-shield-alt"></i> System Activity Tracking</span>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark" style="padding: 8px 15px; font-size: 0.9rem;">
+                {{ total_logs }} Total Entries
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar-nav">
+            <ul style="padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('transcript_requests') }}">
+                        <i class="fas fa-file-alt"></i> Transcript Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('audit_log') }}">
+                        <i class="fas fa-shield-alt"></i> Audit Log
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content-area">
+            <!-- Search -->
+            <div class="dashboard-card" style="padding: 20px; margin-bottom: 20px;">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="auditSearch" placeholder="Search by user, action, or details...">
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header-custom">
+                    <h3 class="card-title"><i class="fas fa-list-alt"></i> System Audit Logs</h3>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="custom-table" id="auditTable">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td style="white-space: nowrap;">
+                                    <small style="color: #666;">{{ log['timestamp'] }}</small>
+                                </td>
+                                <td>
+                                    {% if log['username'] %}
+                                    <strong style="color: var(--unitar-blue);">{{ log['username'] }}</strong>
+                                    {% else %}
+                                    <span style="color: #999;">System</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <code style="background: #f4f4f4; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">{{ log['ip_address'] or 'N/A' }}</code>
+                                </td>
+                                <td>
+                                    <span class="status-badge" 
+                                          style="background: 
+                                          {% if 'LOGIN' in log['action'] %}#d4edda; color: #155724;
+                                          {% elif 'FAILED' in log['action'] %}#f8d7da; color: #721c24;
+                                          {% elif 'SIGN' in log['action'] %}#cce5ff; color: #004085;
+                                          {% elif 'APPROVED' in log['action'] %}#d4edda; color: #155724;
+                                          {% elif 'REJECTED' in log['action'] %}#fff3cd; color: #856404;
+                                          {% else %}#e9ecef; color: #495057;{% endif %}">
+                                        {{ log['action'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small style="color: #666;">{{ log['details'][:60] }}{% if log['details']|length > 60 %}...{% endif %}</small>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-clipboard" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
+                                    <p style="color: #999;">No audit logs found.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <nav style="display: flex; justify-content: center;">
+                        <div style="display: flex; gap: 5px;">
+                            {% if page > 1 %}
+                            <a href="{{ url_for('audit_log', page=page-1) }}" class="btn-action btn-secondary" style="background: #f8f9fa; color: #333; border: 1px solid #ddd;">
+                                Previous
+                            </a>
+                            {% endif %}
+                            
+                            {% for p in range(1, total_pages + 1) %}
+                            {% if p == page %}
+                            <span class="btn-action btn-primary-custom">{{ p }}</span>
+                            {% else %}
+                            <a href="{{ url_for('audit_log', page=p) }}" class="btn-action btn-secondary" style="background: #f8f9fa; color: #333; border: 1px solid #ddd; text-decoration: none;">
+                                {{ p }}
+                            </a>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if page < total_pages %}
+                            <a href="{{ url_for('audit_log', page=page+1) }}" class="btn-action btn-secondary" style="background: #f8f9fa; color: #333; border: 1px solid #ddd;">
+                                Next
+                            </a>
+                            {% endif %}
+                        </div>
+                    </nav>
+                    <p style="text-align: center; color: #999; margin-top: 10px; font-size: 0.9rem;">
+                        Showing page {{ page }} of {{ total_pages }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Security Notice -->
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-info-circle"></i>
+                <strong>Security Notice:</strong> This audit log tracks all critical system actions including logins, document signatures, and transcript requests. Data theft attempts will be detected here if malicious actors attempt to steal student information.
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Search functionality for audit log
+    document.getElementById('auditSearch').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const table = document.getElementById('auditTable');
+        const rows = table.getElementsByTagName('tr');
+        
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let found = false;
+            
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j].textContent.toLowerCase().indexOf(searchValue) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            rows[i].style.display = found ? '' : 'none';
+        }
+    });
+</script>
+
+<style>
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        padding: 48px 0 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    }
+    .sidebar .nav-link {
+        font-weight: 500;
+        color: #333;
+        padding: 10px 20px;
+    }
+    .sidebar .nav-link.active {
+        color: #2470dc;
+        background: #e9ecef;
+    }
+    code {
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}

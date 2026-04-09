@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - EduCryptSign{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="dashboard-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="user-details">
+                <h4>Welcome, Administrator</h4>
+                <span><i class="fas fa-cog"></i> Admin Portal</span>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-warning text-dark" style="padding: 8px 15px; font-size: 0.9rem;">
+                <i class="fas fa-exclamation-circle"></i> {{ pending_transcripts_count }} Pending Requests
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar-nav">
+            <ul style="padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('transcript_requests') }}">
+                        <i class="fas fa-file-alt"></i> Transcript Requests
+                        {% if pending_transcripts_count > 0 %}
+                        <span class="badge bg-danger" style="margin-left: auto;">{{ pending_transcripts_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('audit_log') }}">
+                        <i class="fas fa-shield-alt"></i> Audit Log
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content-area">
+            <!-- Stats Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 25px;">
+                <div class="dashboard-card" style="border-top-color: var(--unitar-orange);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="color: #666; margin: 0 0 5px; font-size: 0.9rem;">Pending Requests</p>
+                            <h3 style="color: var(--unitar-orange); margin: 0; font-size: 2rem;">{{ pending_transcripts_count }}</h3>
+                        </div>
+                        <div style="width: 60px; height: 60px; background: rgba(232, 93, 4, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-alt" style="font-size: 1.5rem; color: var(--unitar-orange);"></i>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('transcript_requests') }}" style="display: block; margin-top: 15px; color: var(--unitar-orange); text-decoration: none; font-weight: 500;">
+                        Process Now <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" style="border-top-color: var(--unitar-blue);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="color: #666; margin: 0 0 5px; font-size: 0.9rem;">System Status</p>
+                            <h3 style="color: var(--unitar-blue); margin: 0; font-size: 1.5rem;">Operational</h3>
+                        </div>
+                        <div style="width: 60px; height: 60px; background: rgba(30, 77, 139, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-server" style="font-size: 1.5rem; color: var(--unitar-blue);"></i>
+                        </div>
+                    </div>
+                    <p style="margin: 15px 0 0; color: #28a745; font-size: 0.9rem;">
+                        <i class="fas fa-check-circle"></i> All systems normal
+                    </p>
+                </div>
+
+                <div class="dashboard-card" style="border-top-color: #28a745;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="color: #666; margin: 0 0 5px; font-size: 0.9rem;">Audit Logs</p>
+                            <h3 style="color: #28a745; margin: 0; font-size: 1.5rem;">View Logs</h3>
+                        </div>
+                        <div style="width: 60px; height: 60px; background: rgba(40, 167, 69, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-shield-alt" style="font-size: 1.5rem; color: #28a745;"></i>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('audit_log') }}" style="display: block; margin-top: 15px; color: #28a745; text-decoration: none; font-weight: 500;">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dashboard-card">
+                <div class="card-header-custom">
+                    <h3 class="card-title"><i class="fas fa-clock"></i> Recent Audit Logs</h3>
+                    <a href="{{ url_for('audit_log') }}" class="btn-action btn-primary-custom">
+                        View All
+                    </a>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>{{ log['timestamp'] }}</td>
+                                <td><strong>{{ log['username'] or 'System' }}</strong></td>
+                                <td>
+                                    <span class="status-badge" style="background: #e9ecef; color: #495057;">
+                                        {{ log['action'] }}
+                                    </span>
+                                </td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ log['details'] or '-' }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

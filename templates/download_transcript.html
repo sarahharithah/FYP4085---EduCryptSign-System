@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Download Transcript - EduCryptSign{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('student_dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('upload_signature') }}">
+                            <i class="fas fa-file-signature"></i> Pending Signatures
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('download_transcript_page') }}">
+                            <i class="fas fa-download"></i> Download Transcript
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Download Transcript</h1>
+            </div>
+
+            {% if ready_transcripts %}
+            <div class="row">
+                {% for transcript in ready_transcripts %}
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-lg border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-check-circle"></i> Ready for Download</h5>
+                        </div>
+                        <div class="card-body text-center p-5">
+                            <div class="mb-4">
+                                <i class="fas fa-file-pdf fa-5x text-success"></i>
+                            </div>
+                            
+                            <h4>Your Transcript Is Ready</h4>
+                            <p class="text-muted mb-4">
+                                Request #{{ transcript['id'] }} | 
+                                Requested on {{ transcript['created_at'][:10] }}
+                            </p>
+                            
+                            <div class="alert alert-light border mb-4 text-start">
+                                <p class="mb-1"><strong>Reason:</strong> {{ transcript['reason'] }}</p>
+                                <p class="mb-1"><strong>Approved by:</strong> {{ transcript['processor_username'] or 'Administrator' }}</p>
+                                <p class="mb-0"><strong>Approved on:</strong> {{ transcript['processed_at'][:10] if transcript['processed_at'] else 'N/A' }}</p>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('download_transcript', request_id=transcript['id']) }}" 
+                                   class="btn btn-success btn-lg">
+                                    <i class="fas fa-download"></i> Download Transcript (PDF)
+                                </a>
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt"></i> 
+                                    Digitally signed and verified
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted small">
+                            <i class="fas fa-info-circle"></i> 
+                            This transcript contains a digital signature for authentication. 
+                            Do not modify the file or the signature will become invalid.
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card shadow">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-clock fa-5x text-warning"></i>
+                    </div>
+                    <h4>No Transcripts Ready Yet</h4>
+                    <p class="text-muted mb-4">
+                        Your transcript requests are being processed by the administrator.
+                        You will be notified when they are ready for download.
+                    </p>
+                    
+                    <a href="{{ url_for('student_dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Request History -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Your Transcript Request History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Reason</th>
+                                    <th>Date Requested</th>
+                                    <th>Status</th>
+                                    <th>Admin Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in all_requests %}
+                                <tr>
+                                    <td>#{{ req['id'] }}</td>
+                                    <td>{{ req['reason'][:40] }}{% if req['reason']|length > 40 %}...{% endif %}</td>
+                                    <td>{{ req['created_at'][:10] }}</td>
+                                    <td>
+                                        {% if req['status'] == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif req['status'] == 'approved' %}
+                                        <span class="badge bg-info">Processing</span>
+                                        {% elif req['status'] == 'ready' %}
+                                        <span class="badge bg-success">Ready</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ req['admin_notes'] or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        padding: 48px 0 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    }
+    .sidebar .nav-link {
+        font-weight: 500;
+        color: #333;
+        padding: 10px 20px;
+    }
+    .sidebar .nav-link.active {
+        color: #2470dc;
+        background: #e9ecef;
+    }
+</style>
+{% endblock %}

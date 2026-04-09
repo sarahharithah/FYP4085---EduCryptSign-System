@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Transcript Requests - EduCryptSign{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="dashboard-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="user-details">
+                <h4>Transcript Requests</h4>
+                <span><i class="fas fa-file-alt"></i> Process Student Requests</span>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark" style="padding: 8px 15px; font-size: 0.9rem;">
+                {{ requests|length }} Total Requests
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar-nav">
+            <ul style="padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('transcript_requests') }}">
+                        <i class="fas fa-file-alt"></i> Transcript Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('audit_log') }}">
+                        <i class="fas fa-shield-alt"></i> Audit Log
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content-area">
+            <div class="dashboard-card">
+                <div class="card-header-custom">
+                    <h3 class="card-title"><i class="fas fa-list"></i> All Transcript Requests</h3>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student</th>
+                                <th>Email</th>
+                                <th>Reason</th>
+                                <th>Signature</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in requests %}
+                            <tr>
+                                <td><strong>#{{ req['id'] }}</strong></td>
+                                <td>{{ req['student_username'] }}</td>
+                                <td>{{ req['student_email'] }}</td>
+                                <td>{{ req['reason'][:30] }}{% if req['reason']|length > 30 %}...{% endif %}</td>
+                                <td>
+                                    {% if req['signature_path'] %}
+                                    <span class="status-badge badge-approved"><i class="fas fa-check"></i> Uploaded</span>
+                                    {% else %}
+                                    <span class="status-badge" style="background: #e9ecef; color: #666;">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ req['created_at'][:10] }}</td>
+                                <td>
+                                    {% if req['status'] == 'pending' %}
+                                    <span class="status-badge badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                                    {% elif req['status'] == 'approved' %}
+                                    <span class="status-badge badge-approved"><i class="fas fa-check"></i> Processing</span>
+                                    {% elif req['status'] == 'ready' %}
+                                    <span class="status-badge badge-ready"><i class="fas fa-download"></i> Ready</span>
+                                    {% else %}
+                                    <span class="status-badge badge-rejected"><i class="fas fa-times"></i> Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('verify_transcript', request_id=req['id']) }}" 
+                                       class="btn-action btn-primary-custom">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
+                                    <p style="color: #999;">No transcript requests found.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

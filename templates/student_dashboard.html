@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard - EduCryptSign{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="dashboard-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="user-details">
+                <h4>Welcome, {{ user['username'] }}</h4>
+                <span><i class="fas fa-graduation-cap"></i> Student Portal</span>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark" style="padding: 8px 15px; font-size: 0.9rem;">
+                <i class="fas fa-shield-alt text-success"></i> Secure Session
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar-nav">
+            <ul style="padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('student_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('request_transcript') }}">
+                        <i class="fas fa-file-signature"></i> Request Transcript
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content-area">
+            {% if ready_transcript %}
+            <!-- Ready Transcript Alert -->
+            <div class="dashboard-card success" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 3rem;"></i>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 10px 0;">Your Transcript Is Ready!</h4>
+                        <p style="margin: 0; opacity: 0.9;">Your authenticated academic transcript has been approved and is ready for download.</p>
+                    </div>
+                    <a href="{{ url_for('download_transcript', request_id=ready_transcript['id']) }}" 
+                       class="btn btn-light btn-lg">
+                        <i class="fas fa-download"></i> Download Now
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 25px;">
+                <div class="dashboard-card" style="border-top-color: var(--unitar-blue);">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--unitar-blue), var(--unitar-light-blue)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-file-signature" style="font-size: 2rem; color: white;"></i>
+                        </div>
+                        <h5 style="color: var(--unitar-blue); margin-bottom: 10px;">Request Transcript</h5>
+                        <p style="color: #666; margin-bottom: 20px;">Submit a new transcript request with your digital signature</p>
+                        <a href="{{ url_for('request_transcript') }}" class="btn-action btn-primary-custom" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-plus"></i> New Request
+                        </a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card" style="border-top-color: #28a745;">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745, #20c997); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-history" style="font-size: 2rem; color: white;"></i>
+                        </div>
+                        <h5 style="color: #28a745; margin-bottom: 10px;">My Requests</h5>
+                        <p style="color: #666; margin-bottom: 20px;">View status of your transcript requests</p>
+                        <span class="badge bg-info" style="padding: 10px 20px; font-size: 1rem;">
+                            {{ transcript_requests|length }} Total Requests
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request History Table -->
+            <div class="dashboard-card">
+                <div class="card-header-custom">
+                    <h3 class="card-title"><i class="fas fa-list"></i> My Transcript Request History</h3>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Reason</th>
+                                <th>Date Requested</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in transcript_requests %}
+                            <tr>
+                                <td><strong>#{{ req['id'] }}</strong></td>
+                                <td>{{ req['reason'][:50] }}{% if req['reason']|length > 50 %}...{% endif %}</td>
+                                <td>{{ req['created_at'][:10] }}</td>
+                                <td>
+                                    {% if req['status'] == 'pending' %}
+                                    <span class="status-badge badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                                    {% elif req['status'] == 'approved' %}
+                                    <span class="status-badge badge-approved"><i class="fas fa-check"></i> Processing</span>
+                                    {% elif req['status'] == 'ready' %}
+                                    <span class="status-badge badge-ready"><i class="fas fa-download"></i> Ready</span>
+                                    {% else %}
+                                    <span class="status-badge badge-rejected"><i class="fas fa-times"></i> Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if req['status'] == 'ready' %}
+                                    <a href="{{ url_for('download_transcript', request_id=req['id']) }}" 
+                                       class="btn-action btn-success-custom">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    {% else %}
+                                    <span style="color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    <i class="fas fa-inbox" style="font-size: 3rem; color: #ddd; margin-bottom: 15px; display: block;"></i>
+                                    <p style="color: #999;">No requests yet. Click "New Request" to get started.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

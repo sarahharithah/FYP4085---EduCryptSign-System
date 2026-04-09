@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Register - EduCryptSign{% endblock %}
+
+{% block content %}
+<div class="login-page" style="background: linear-gradient(rgba(30, 77, 139, 0.85), rgba(30, 77, 139, 0.95)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;">
+    <div class="login-container">
+        <!-- Left Side - Information -->
+        <div class="login-info">
+            <h2>Create Your Account</h2>
+            <p>Join EduCryptSign to securely manage your academic documents with military-grade encryption and digital signatures.</p>
+            
+            <ul class="feature-list">
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Secure account with MFA protection</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Request transcripts digitally</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Track request status in real-time</span>
+                </li>
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Download verified documents instantly</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Right Side - Registration Form -->
+        <div class="login-card" style="width: 450px;">
+            <h3>Create New Account</h3>
+            
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password (min. 8 characters)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" name="password" placeholder="Create a strong password" required minlength="8">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" name="confirm_password" placeholder="Re-enter your password" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <select class="form-control" name="role" required>
+                            <option value="student">Student</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-user-plus"></i> Register Account
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>- OR -</span>
+            </div>
+            
+            <a href="{{ url_for('login') }}" class="btn-secondary btn-register" style="background: var(--unitar-blue);">
+                <i class="fas fa-arrow-left"></i> Back to Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
