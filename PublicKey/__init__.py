@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+#  SelfTest/PublicKey/__init__.py: Self-test for public key crypto
+#
+# Written in 2008 by Dwayne C. Litzenberger <dlitz@dlitz.net>
+#
 # ===================================================================
 # The contents of this file are dedicated to the public domain.  To
 # the extent that dedication to the public domain is not available,
@@ -18,77 +22,32 @@
 # SOFTWARE.
 # ===================================================================
 
-from Crypto.Util.asn1 import (DerSequence, DerInteger, DerBitString,
-                             DerObjectId, DerNull)
+"""Self-test for public-key crypto"""
+
+import unittest
+from Crypto.SelfTest.PublicKey import (test_DSA, test_RSA,
+                                       test_ECC_NIST, test_ECC_25519, test_ECC_448,
+                                       test_import_DSA, test_import_RSA,
+                                       test_import_ECC, test_ElGamal)
 
 
-def _expand_subject_public_key_info(encoded):
-    """Parse a SubjectPublicKeyInfo structure.
+def get_tests(config={}):
+    tests = []
+    tests += test_DSA.get_tests(config=config)
+    tests += test_RSA.get_tests(config=config)
+    tests += test_ECC_NIST.get_tests(config=config)
+    tests += test_ECC_25519.get_tests(config=config)
+    tests += test_ECC_448.get_tests(config=config)
 
-    It returns a triple with:
-        * OID (string)
-        * encoded public key (bytes)
-        * Algorithm parameters (bytes or None)
-    """
+    tests += test_import_DSA.get_tests(config=config)
+    tests += test_import_RSA.get_tests(config=config)
+    tests += test_import_ECC.get_tests(config=config)
 
-    #
-    # SubjectPublicKeyInfo  ::=  SEQUENCE  {
-    #   algorithm         AlgorithmIdentifier,
-    #   subjectPublicKey  BIT STRING
-    # }
-    #
-    # AlgorithmIdentifier  ::=  SEQUENCE  {
-    #   algorithm   OBJECT IDENTIFIER,
-    #   parameters  ANY DEFINED BY algorithm OPTIONAL
-    # }
-    #
-
-    spki = DerSequence().decode(encoded, nr_elements=2)
-    algo = DerSequence().decode(spki[0], nr_elements=(1,2))
-    algo_oid = DerObjectId().decode(algo[0])
-    spk = DerBitString().decode(spki[1]).value
-
-    if len(algo) == 1:
-        algo_params = None
-    else:
-        try:
-            DerNull().decode(algo[1])
-            algo_params = None
-        except:
-            algo_params = algo[1]
-
-    return algo_oid.value, spk, algo_params
+    tests += test_ElGamal.get_tests(config=config)
+    return tests
 
 
-def _create_subject_public_key_info(algo_oid, public_key, params):
-
-    if params is None:
-        algorithm = DerSequence([DerObjectId(algo_oid)])
-    else:
-        algorithm = DerSequence([DerObjectId(algo_oid), params])
-
-    spki = DerSequence([algorithm,
-                        DerBitString(public_key)
-                        ])
-    return spki.encode()
-
-
-def _extract_subject_public_key_info(x509_certificate):
-    """Extract subjectPublicKeyInfo from a DER X.509 certificate."""
-
-    certificate = DerSequence().decode(x509_certificate, nr_elements=3)
-    tbs_certificate = DerSequence().decode(certificate[0],
-                                           nr_elements=range(6, 11))
-
-    index = 5
-    try:
-        tbs_certificate[0] + 1
-        # Version not present
-        version = 1
-    except TypeError:
-        version = DerInteger(explicit=0).decode(tbs_certificate[0]).value
-        if version not in (2, 3):
-            raise ValueError("Incorrect X.509 certificate version")
-        index = 6
-
-    return tbs_certificate[index]
+if __name__ == '__main__':
+    def suite():
+        return unittest.TestSuite(get_tests())
+    unittest.main(defaultTest='suite')
