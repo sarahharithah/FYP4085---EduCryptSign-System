@@ -18,7 +18,7 @@
 # SOFTWARE.
 # ===================================================================
 
-__all__ = ['HMAC', 'MD2', 'MD4', 'MD5', 'RIPEMD160', 'SHA1',
-           'SHA224', 'SHA256', 'SHA384', 'SHA512', 'CMAC', 'Poly1305',
-           'cSHAKE128', 'cSHAKE256', 'KMAC128', 'KMAC256',
-           'TupleHash128', 'TupleHash256', 'KangarooTwelve']
+# This file exists for backward compatibility with old code that refers to
+# Crypto.Hash.SHA
+
+from Crypto.Hash.SHA1 import __doc__, new, block_size, digest_size
